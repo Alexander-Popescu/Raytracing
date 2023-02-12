@@ -1,27 +1,50 @@
 use crate::vec3::Vec3;
 
-struct Ray {
+#[derive(Debug, Copy, Clone)]
+pub struct Ray {
+    //a indicates the origin of the ray  b represents the direction of the ray
     A: Vec3,
     B: Vec3
 }
 
 impl Ray {
-    fn ray(a: Vec3, b: Vec3) -> Ray {
+    pub fn ray(a: Vec3, b: Vec3) -> Ray {
         Ray {
             A: a,
             B: b
         }
     }
 
-    fn origin () -> Vec3 {
-        A
+    pub fn origin(self) -> Vec3 {
+        self.A
     }
 
-    fn direction() -> Vec3 {
-        B
+    pub fn direction(self) -> Vec3 {
+        self.B
     }
 
-    fn point_at_parameter(t: f32) -> Vec3 {
-        A + B * t
+    pub fn point_at_parameter(self, t: f32) -> Vec3 {
+        self.A + self.B * t
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn test_ray_origin() {
+
+    }
+
+    #[test]
+    fn test_ray_direction() {
+
+    }
+
+    #[test]
+    fn test_ray_point_at_parameter() {
+        
     }
 }

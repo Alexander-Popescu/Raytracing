@@ -16,6 +16,7 @@ impl Vec3 {
         }
     }
 
+    //getter functions
     pub fn x(self) -> f32 {
         self.e[0]
     }
@@ -40,6 +41,10 @@ impl Vec3 {
         self.e[2]
     }
 
+    pub fn dot(self, other: Vec3) -> f32 {
+        self.e[0] * other.e[0] + self.e[1] * other.e[1] + self.e[2] * other.e[2]
+    }
+
     pub fn length(self) -> f32 {
         //takes the square root of the sum of each element in the vector squared
         (self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]).sqrt()
@@ -62,6 +67,18 @@ impl ops::Add for Vec3 {
         Vec3 { e: [self.e[0] + rhs.e[0],
                     self.e[1] + rhs.e[1],
                     self.e[2] + rhs.e[2]]
+            }
+    }
+}
+
+impl ops::Sub for Vec3 {
+    type Output = Self;
+    
+    fn sub(self, rhs: Vec3) -> Self::Output {
+        //rhs is right hand side of the operator
+        Vec3 { e: [self.e[0] - rhs.e[0],
+                    self.e[1] - rhs.e[1],
+                    self.e[2] - rhs.e[2]]
             }
     }
 }

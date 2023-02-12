@@ -61,10 +61,14 @@ fn write_to_ppm(width: i32, height: i32, max_color_value: i32, file: &mut File)
 }
 
 fn color(r: &Ray) -> Vec3 { //takes ray, turns direction vector into unit vector, does lerp function -> (1 - t) * startValue + t * endValue
-    //check if hit sphere, set color to blue if it does
-    if hit_sphere(Vec3::new(0.0,0.0, -1.0), 0.5, r) {
-        return Vec3::new(0.0,0.0,1.0);
+    //check if hit sphere, set color to the normal of the point
+    let t = hit_sphere(Vec3::new(0.0,0.0,-1.0), 0.5, r);
+    if t > 0.0 {
+        let n = Vec3::unit_vector(&(r.point_at_parameter(t) - Vec3::new(0.0, 0.0, -1.0)));
+        return Vec3::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0) * 0.5;
     }
+
+    //background color of no other returns
 
     let unit_direction = Vec3::unit_vector(&r.direction());
     let t = 0.5 * (unit_direction.y() + 1.0);
@@ -72,11 +76,16 @@ fn color(r: &Ray) -> Vec3 { //takes ray, turns direction vector into unit vector
     (Vec3::new(1.0,1.0,1.0) * (1.0 - t)) + (Vec3::new(0.5,0.7,1.0) * t)
 }
 
-fn hit_sphere(center: Vec3, radius: f32, r: &Ray) -> bool { //checks if an input ray r will intersect with a sphere centered at center with radius radius
+fn hit_sphere(center: Vec3, radius: f32, r: &Ray) -> f32 { //checks if an input ray r will intersect with a sphere centered at center with radius radius and returns point
     let oc = r.origin() - center;
     let a = r.direction().dot(r.direction());
     let b = 2.0 * oc.dot(r.direction());
     let c = oc.dot(oc) - radius * radius;
     let discriminant = b * b - 4.0 * a * c;
-    discriminant > 0.0
+    
+    if discriminant < 0.0 {
+        -1.0
+    } else {
+        (-b - discriminant.sqrt()) / (2.0 * a)
+    }
 }

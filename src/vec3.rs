@@ -1,7 +1,7 @@
 //vec3 module
 
 //this line adds an implementation for the std::fmt formatting trait by deriving the fmt::Debug implementation so that we can print vectors to std::out
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
 
 pub struct Vec3 {
     //this chunk of code creates a vec3 class that was 1 attribute e which is a 3 item array of f32s
@@ -41,10 +41,9 @@ impl Vec3 {
         self.e[2]
     }
 
-    pub fn dot(self, other: Vec3) -> f32 {
-        self.e[0] * other.e[0] + self.e[1] * other.e[1] + self.e[2] * other.e[2]
+    pub fn dot(v1: &Vec3, v2: &Vec3) -> f32 {
+        v1.e[0] * v2.e[0] + v1.e[1] * v2.e[1] + v1.e[2] * v2.e[2]
     }
-
     pub fn length(self) -> f32 {
         //takes the square root of the sum of each element in the vector squared
         (self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]).sqrt()
@@ -59,6 +58,7 @@ impl Vec3 {
 //Because add is a function call (a + b -> a.add(b)), you can overwrite this function when the inputs for the add function are vec3s, in this case,
 //we are taking each e value for the vecs, adding them together, and returning a new vec3 with added values of the other two
 use std::ops;
+
 impl ops::Add for Vec3 {
     type Output = Self;
     

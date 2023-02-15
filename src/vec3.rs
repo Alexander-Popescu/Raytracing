@@ -52,6 +52,9 @@ impl Vec3 {
     pub fn unit_vector(v: &Vec3) -> Vec3 {
         *v / v.length()
     }
+    pub fn squared_length(self) -> f32 {
+        self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]
+    }
 }
 
 //overload add operator for vec3

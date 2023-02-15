@@ -1,4 +1,3 @@
-//TODO REWRITE / UNDERSTAND / CLEANUP THE CODE
 //import vec3
 mod vec3;
 use vec3::Vec3;
@@ -31,7 +30,7 @@ fn main() {
     let width: i32 = 200;
     let height: i32 = 100;
     let max_color_value: i32 = 255;
-    let samples_per_pixel = 100;
+    let samples_per_pixel = 100;//number of samples taken for anti-aliasing
 
     //other variables
     
@@ -39,11 +38,12 @@ fn main() {
     let viewport_height = 2.0;
     let viewport_width = aspect_ratio * viewport_height;
     let focal_length = 1.0;
-
-    let origin = Vec3::new(0.0,0.0,0.0);
+    
+    //camera variables
+    let origin = Vec3::new(0.0,0.0,0.0);//camera ray origin
     let horizontal = Vec3::new(viewport_width,0.0,0.0);
     let vertical = Vec3::new(0.0,viewport_height,0.0);
-    let lower_left_corner = origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0,0.0, focal_length);
+    let lower_left_corner = origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0,0.0, focal_length);//starting point for raycasts
 
 
     //camera do
@@ -57,7 +57,7 @@ fn main() {
     let mut list: Vec<Box<dyn Hittable>> = Vec::new(); //mutable array of hittable items
     list.push(Box::new(Sphere::sphere(Vec3::new(0.0, 0.0, -1.0), 0.5))); // add new sphere 1 unit in front of the camera
     list.push(Box::new(Sphere::sphere(Vec3::new(0.0, -100.5, -1.0),100.0,))); // add another huge sphere far below the camera to appear as a ground
-    let world = HittableList::new(list);
+    let world = HittableList::new(list);//world struct containing all scene objects
 
     //loop through all pixels in the image
     for row in (0..height).rev() {
@@ -70,8 +70,9 @@ fn main() {
                 let r = Ray::ray(origin, lower_left_corner + horizontal * u + vertical * v);
                 col = col + color(&r, &world);
             }
-            col = col / samples_per_pixel as f32;
+            col = col / samples_per_pixel as f32;// average out all sampeles taken
 
+            //scale to 255 max color value
             let ir = 255.99 * col.r();
             let ig = 255.99 * col.g();
             let ib = 255.99 * col.b();
@@ -92,12 +93,14 @@ fn color(r: &Ray, world: &HittableList) -> Vec3 {
     let mut rec = HitRecord::default();
 
     if world.hit(&r, 0.0, std::f32::MAX, &mut rec) {
+        //if hit the sphere return the normal vec as rgb
         return Vec3::new(
                 rec.normal().x() + 1.0,
                 rec.normal().y() + 1.0,
                 rec.normal().z() + 1.0,
             ) * 0.5;
     } else {
+        //background gradient pixels
         let unit_direction = Vec3::unit_vector(&r.direction());
         let t = 0.5 * (unit_direction.y() + 1.0);
 
@@ -119,5 +122,3 @@ fn clamp(x: f32, min: f32, max: f32) -> f32 {
     }
     return x;
 }
-
-//TODO rewrite write_color func like in the book, change main like they say, and anti aliasing is done bassically

@@ -1,4 +1,3 @@
-//TODO REWRITE / UNDERSTAND / CLEANUP THE CODE
 //import vec3
 mod vec3;
 use vec3::Vec3;
@@ -28,10 +27,11 @@ fn main() {
 
     //define screen variables
 
-    let width: i32 = 200;
-    let height: i32 = 100;
+    let width: i32 = 400;
+    let height: i32 = 200;
     let max_color_value: i32 = 255;
     let samples_per_pixel = 100;
+    let max_depth = 50;
 
     //other variables
     
@@ -68,13 +68,20 @@ fn main() {
                 let u = (column as f32 + rand_num.gen::<f32>()) / (width as f32 - 1.0);
                 let v = (row as f32 + rand_num.gen::<f32>()) / (height as f32 - 1.0);
                 let r = Ray::ray(origin, lower_left_corner + horizontal * u + vertical * v);
-                col = col + color(&r, &world);
+                col = col + color(&r, &world, max_depth);
             }
-            col = col / samples_per_pixel as f32;
+            //col = col / samples_per_pixel as f32;
+            let scale = 1.0 / samples_per_pixel as f32;
 
-            let ir = 255.99 * col.r();
-            let ig = 255.99 * col.g();
-            let ib = 255.99 * col.b();
+            //sqrt for gamma correction for gamma = 2.0
+            let ir = (scale * col.r()).sqrt();
+            let ig = (scale * col.g()).sqrt();
+            let ib = (scale * col.b()).sqrt();
+
+            //scale so actually visible
+            let ir: f32 = 255.99 * ir;
+            let ig: f32 = 255.99 * ig;
+            let ib: f32 = 255.99 * ib;
 
             //writes each pixel to the file
             println!("{} {} {}\n", ir, ig, ib);
@@ -88,15 +95,17 @@ fn main() {
 
 }
 
-fn color(r: &Ray, world: &HittableList) -> Vec3 {
+fn color(r: &Ray, world: &HittableList, depth: i32) -> Vec3 {
     let mut rec = HitRecord::default();
 
+    //exit loop after certain number of light bounces
+    if depth <= 0 {
+        return Vec3::new(0.0,0.0,0.0);
+    }
+
     if world.hit(&r, 0.0, std::f32::MAX, &mut rec) {
-        return Vec3::new(
-                rec.normal().x() + 1.0,
-                rec.normal().y() + 1.0,
-                rec.normal().z() + 1.0,
-            ) * 0.5;
+        let target: Vec3 = rec.p() + rec.normal() + rand_point_in_unit_sphere();
+        return color(&Ray::ray(rec.p(), target - rec.p()), world, depth - 1) * 0.5;
     } else {
         let unit_direction = Vec3::unit_vector(&r.direction());
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -110,14 +119,12 @@ fn rand_num(min: f32, max: f32) -> f32 {
     return rand
 }
 
-fn clamp(x: f32, min: f32, max: f32) -> f32 {
-    if x < min {
-        return min;
-    } 
-    if x > max {
-        return max;
+fn rand_point_in_unit_sphere() -> Vec3 {
+    loop {
+        let point: Vec3 = Vec3::new(rand_num(-1.0, 1.0),rand_num(-1.0, 1.0),rand_num(-1.0, 1.0));
+        if point.squared_length() >= 1.0 {
+            continue;
+        }
+        return point;
     }
-    return x;
 }
-
-//TODO rewrite write_color func like in the book, change main like they say, and anti aliasing is done bassically

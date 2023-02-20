@@ -57,7 +57,7 @@ fn main() {
     let mut list: Vec<Box<dyn Hittable>> = Vec::new(); //mutable array of hittable items
     list.push(Box::new(Sphere::sphere(Vec3::new(0.0, 0.0, -1.0), 0.5))); // add new sphere 1 unit in front of the camera
     list.push(Box::new(Sphere::sphere(Vec3::new(0.0, -100.5, -1.0),100.0,))); // add another huge sphere far below the camera to appear as a ground
-    let world = HittableList::new(list);
+    let world = HittableList::new(list);//world struct containing all scene objects
 
     //loop through all pixels in the image
     for row in (0..height).rev() {
@@ -107,6 +107,7 @@ fn color(r: &Ray, world: &HittableList, depth: i32) -> Vec3 {
         let target: Vec3 = rec.p() + rec.normal() + rand_point_in_unit_sphere();
         return color(&Ray::ray(rec.p(), target - rec.p()), world, depth - 1) * 0.5;
     } else {
+        //background gradient pixels
         let unit_direction = Vec3::unit_vector(&r.direction());
         let t = 0.5 * (unit_direction.y() + 1.0);
 

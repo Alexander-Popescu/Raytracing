@@ -103,8 +103,8 @@ fn color(r: &Ray, world: &HittableList, depth: i32) -> Vec3 {
         return Vec3::new(0.0,0.0,0.0);
     }
 
-    if world.hit(&r, 0.0, std::f32::MAX, &mut rec) {
-        let target: Vec3 = rec.p() + rec.normal() + rand_point_in_unit_sphere();
+    if world.hit(&r, 0.001, std::f32::MAX, &mut rec) {
+        let target: Vec3 = rec.p() + rec.normal() + rand_unit_vector();
         return color(&Ray::ray(rec.p(), target - rec.p()), world, depth - 1) * 0.5;
     } else {
         //background gradient pixels
@@ -128,4 +128,8 @@ fn rand_point_in_unit_sphere() -> Vec3 {
         }
         return point;
     }
+}
+
+fn rand_unit_vector() -> Vec3 {
+    Vec3::unit_vector(&rand_point_in_unit_sphere())
 }

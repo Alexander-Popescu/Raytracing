@@ -1,11 +1,13 @@
 use crate::ray::Ray;
 use crate::vec3::Vec3;
+use crate::material::Material;
 
 #[derive(Default)]
 pub struct HitRecord {
-    t: f32,
-    p: Vec3,
-    normal: Vec3,
+    pub t: f32,
+    pub p: Vec3,
+    pub normal: Vec3,
+    pub material: Material
 }
 
 impl HitRecord {
@@ -17,6 +19,9 @@ impl HitRecord {
     }
     pub fn normal(&self) -> Vec3 {
         self.normal
+    }
+    pub fn material(&self) -> Material {
+        self.material
     }
     pub fn set_p(&mut self, val: Vec3) {
         self.p = val
@@ -30,7 +35,7 @@ impl HitRecord {
 }
 
 pub trait Hittable {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool {
-        false
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
+        None
     }
 }

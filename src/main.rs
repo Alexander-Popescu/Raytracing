@@ -21,52 +21,33 @@ use rand::prelude::*;
 
 fn main() {
 
-    //define screen variables
+    //various variables
 
+    //resolution must be 2:1
     let width: i32 = 500;
     let height: i32 = 250;
+
+    //maximum value for rgb pixel channels
     let max_color_value: i32 = 255;
+
+    //used to anti-alias by averaging samples
     let samples_per_pixel = 100;
-
-
-    //camera do
-    let camera = Camera::camera();
-
     let mut rand_num = rand::thread_rng();
 
-    let mut list: Vec<Box<dyn Hittable>> = Vec::new(); //mutable array of hittable items
+    //initialize camera
+    let camera = Camera::camera();
 
-    //add spheres to the list
+    //list to hold hittable items (spheres for now)
+    let mut list: Vec<Box<dyn Hittable>> = Vec::new();
 
-    list.push(Box::new(Sphere::sphere(
-        Vec3::new(0.0, 0.0, -1.0),
-        0.5,
-        Material::Lambertian {
-            albedo: Vec3::new(0.8, 0.3, 0.3),
-        },
-    )));
-    list.push(Box::new(Sphere::sphere(
-        Vec3::new(0.0, -100.5, -1.0),
-        100.0,
-        Material::Lambertian {
-            albedo: Vec3::new(0.4, 0.4, 0.4),
-        },
-    )));
-    list.push(Box::new(Sphere::sphere(
-        Vec3::new(1.0, 0.0, -1.0),
-        0.5,
-        Material::Metal {
-            albedo: Vec3::new(0.8, 0.6, 0.2),
-        },
-    )));
-    list.push(Box::new(Sphere::sphere(
-        Vec3::new(-1.0, 0.0, -1.0),
-        0.5,
-        Material::Metal {
-            albedo: Vec3::new(0.8, 0.8, 0.8),
-        },
-    )));
-    let world = HittableList::new(list);//world struct containing all scene objects
+    //append spheres to the list
+    list.push(Box::new(Sphere::sphere(Vec3::new(0.0, 0.0, -1.0),0.5,Material::Lambertian {albedo: Vec3::new(0.8, 0.3, 0.3),},))); // red sphere
+    list.push(Box::new(Sphere::sphere(Vec3::new(0.0, -100.5, -1.0),100.0,Material::Lambertian {albedo: Vec3::new(0.4, 0.4, 0.4),},))); // "ground" sphere
+    list.push(Box::new(Sphere::sphere(Vec3::new(1.0, 0.0, -1.0),0.5,Material::Metal {albedo: Vec3::new(0.8, 0.6, 0.2),},))); // Gold sphere
+    list.push(Box::new(Sphere::sphere(Vec3::new(-1.0, 0.0, -1.0),0.5,Material::Metal {albedo: Vec3::new(0.8, 0.8, 0.8),},))); // Silver sphere
+
+    //take list of hittables and put them in a hittablelist
+    let world = HittableList::new(list);
 
     //boilerplate ppm stuff
     println!("P3\n{} {}\n{}", &width, &height, &max_color_value);
@@ -103,47 +84,23 @@ fn main() {
 }
 
 fn color(r: &Ray, world: &HittableList, depth: i32) -> Vec3 {
+
+    //check if hit returns something
     if let Some(rec) = world.hit(&r, 0.001, std::f32::MAX) {
         let mut scattered = Ray::ray(Vec3::default(), Vec3::default());
-        let mut attentuation = Vec3::default();
+        let mut attenuation = Vec3::default();
 
-        if depth < 50 && scatter(&rec.material, r, &rec, &mut attentuation, &mut scattered) {
-            return attentuation * color(&scattered, world, depth + 1);
+        //stop iterating reflections if this pixel is past 50 iterations, otherwise compute color
+        if depth < 50 && scatter(&rec.material, r, &rec, &mut attenuation, &mut scattered) {
+            return attenuation * color(&scattered, world, depth + 1);
         } else {
             return Vec3::new(0.0, 0.0, 0.0);
         }
     } else {
+        //render background gradient if nothing was hit
         let unit_direction = Vec3::unit_vector(&r.direction());
         let t = 0.5 * (unit_direction.y() + 1.0);
 
         Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t
-    }
-}
-
-fn rand_num(min: f32, max: f32) -> f32 {
-    let rand: f32 = rand::thread_rng().gen_range(min..max);
-    return rand
-}
-
-fn rand_point_in_unit_sphere() -> Vec3 {
-    loop {
-        let point: Vec3 = Vec3::new(rand_num(-1.0, 1.0),rand_num(-1.0, 1.0),rand_num(-1.0, 1.0));
-        if point.squared_length() >= 1.0 {
-            continue;
-        }
-        return point;
-    }
-}
-
-fn rand_unit_vector() -> Vec3 {
-    Vec3::unit_vector(&rand_point_in_unit_sphere())
-}
-
-fn rand_in_hemisphere(normal: Vec3) -> Vec3 {
-    let in_unit_sphere: Vec3 = rand_point_in_unit_sphere();
-    if Vec3::dot(&in_unit_sphere, &normal) > 0.0 { // In the same hemisphere as the normal
-        in_unit_sphere
-    } else {
-        in_unit_sphere * -1.0
     }
 }

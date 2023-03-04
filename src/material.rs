@@ -10,7 +10,8 @@ pub enum Material {
         albedo: Vec3,
     },
     Metal {
-        albedo: Vec3
+        albedo: Vec3,
+        fuzziness: f32,
     },
     Dielectric {
 
@@ -31,9 +32,9 @@ pub fn scatter(material: &Material, ray_in: &Ray, rec: &HitRecord, attenuation: 
             *attenuation = albedo;
             return true;
         }
-        &Material::Metal { albedo } => {
+        &Material::Metal { albedo, fuzziness } => {
             let reflected = reflect(&Vec3::unit_vector(&ray_in.direction()), &rec.normal());
-            *scattered = Ray::ray(rec.p(), reflected);
+            *scattered = Ray::ray(rec.p(), reflected + rand_point_in_unit_sphere() * fuzziness);
             *attenuation = albedo;
             return Vec3::dot(&scattered.direction(), &rec.normal()) > 0.0;
         }

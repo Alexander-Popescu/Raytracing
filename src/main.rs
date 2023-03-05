@@ -42,9 +42,11 @@ fn main() {
 
     //append spheres to the list
     list.push(Box::new(Sphere::sphere(Vec3::new(0.0, 0.0, -1.0),0.5,Material::Lambertian {albedo: Vec3::new(0.8, 0.3, 0.3),},))); // red sphere
-    list.push(Box::new(Sphere::sphere(Vec3::new(0.0, -100.5, -1.0),100.0,Material::Lambertian {albedo: Vec3::new(0.8, 0.8, 0.0),},))); // "ground" sphere
-    list.push(Box::new(Sphere::sphere(Vec3::new(1.0, 0.0, -1.0),0.5,Material::Metal {albedo: Vec3::new(0.8, 0.6, 0.2), fuzziness: 0.5},))); // Gold sphere, fuzzy
-    list.push(Box::new(Sphere::sphere(Vec3::new(-1.0, 0.0, -1.0),0.5,Material::Metal {albedo: Vec3::new(0.8, 0.8, 0.8), fuzziness: 0.0},))); // Silver sphere, perfect reflections
+    list.push(Box::new(Sphere::sphere(Vec3::new(0.0, -100.5, -1.0),100.0,Material::Lambertian {albedo: Vec3::new(0.2, 0.2, 0.2),},))); // "ground" sphere
+    list.push(Box::new(Sphere::sphere(Vec3::new(1.0, 0.0, -1.0),0.5,Material::Metal {albedo: Vec3::new(0.8, 0.6, 0.2), fuzziness: 0.3},))); // Gold sphere, fuzzy
+    list.push(Box::new(Sphere::sphere(Vec3::new(-1.0, 0.0, -1.0),0.5,Material::Dielectric { ref_index: (1.5) },))); //glass sphere
+    list.push(Box::new(Sphere::sphere(Vec3::new(-1.0, 0.0, -1.0),-0.45,Material::Dielectric { ref_index: (1.5) },))); //glass sphere with negative radius put inside the other one, to make a hollow glass sphere
+    //list.push(Box::new(Sphere::sphere(Vec3::new(-1.0, 0.0, -1.0),0.5,Material::Metal {albedo: Vec3::new(0.8, 0.8, 0.8), fuzziness: 0.0},))); // Silver sphere, perfect reflections
 
     //take list of hittables and put them in a hittablelist
     let world = HittableList::new(list);

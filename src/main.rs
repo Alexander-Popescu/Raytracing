@@ -21,11 +21,11 @@ use rand::prelude::*;
 
 fn main() {
 
-    //various variables
+    //resolution variables
 
-    //resolution must be 2:1
-    let width: i32 = 600;
-    let height: i32 = width / 2;
+    let width: i32 = 400;
+    let height: i32 = 200;
+    let aspect_ratio = width as f32 / height as f32;
 
     //maximum value for rgb pixel channels
     let max_color_value: i32 = 255;
@@ -34,8 +34,16 @@ fn main() {
     let samples_per_pixel = 100;
     let mut rand_num = rand::thread_rng();
 
-    //initialize camera
-    let camera = Camera::camera(Vec3::new(-1.0,0.0,1.0), Vec3::new(0.0,0.0,-1.0), Vec3::new(0.0,1.0,0.0), 90.0, width as f32 / height as f32);
+    //initialize camera variables
+    let look_from: Vec3 = Vec3::new(3.0,3.0,2.0);//camera position
+    let look_at: Vec3 = Vec3::new(0.0,0.0,-1.0);//target position
+    let v_up: Vec3 = Vec3::new(0.0,1.0,0.0);//up direction for camera
+    let focus_distance: f32 = (look_from - look_at).length();//distance to the target (if you want it in focus)
+    let aperture: f32 = 1.0;//larger = more depth of field
+    let vfov = 20.0;//vertical field of view
+
+    //and the camera
+    let camera = Camera::camera(look_from, look_at, v_up, vfov, aspect_ratio, aperture, focus_distance);
 
     //list to hold hittable items (spheres for now)
     let mut list: Vec<Box<dyn Hittable>> = Vec::new();

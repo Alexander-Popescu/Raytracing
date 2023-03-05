@@ -24,8 +24,8 @@ fn main() {
     //various variables
 
     //resolution must be 2:1
-    let width: i32 = 500;
-    let height: i32 = 250;
+    let width: i32 = 600;
+    let height: i32 = width / 2;
 
     //maximum value for rgb pixel channels
     let max_color_value: i32 = 255;
@@ -35,7 +35,7 @@ fn main() {
     let mut rand_num = rand::thread_rng();
 
     //initialize camera
-    let camera = Camera::camera();
+    let camera = Camera::camera(Vec3::new(-1.0,0.0,1.0), Vec3::new(0.0,0.0,-1.0), Vec3::new(0.0,1.0,0.0), 90.0, width as f32 / height as f32);
 
     //list to hold hittable items (spheres for now)
     let mut list: Vec<Box<dyn Hittable>> = Vec::new();

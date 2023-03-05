@@ -44,6 +44,11 @@ impl Vec3 {
     pub fn dot(v1: &Vec3, v2: &Vec3) -> f32 {
         v1.e[0] * v2.e[0] + v1.e[1] * v2.e[1] + v1.e[2] * v2.e[2]
     }
+    pub fn cross(v1: &Vec3, v2: &Vec3) -> Vec3 {
+        Vec3 {
+            e: [v1.e[1] * v2.e[2] - v1.e[2] * v2.e[1], v1.e[2] * v2.e[0] - v1.e[0] * v2.e[2], v1.e[0] * v2.e[1] - v1.e[1] * v2.e[0]]
+        }
+    }
     pub fn length(self) -> f32 {
         //takes the square root of the sum of each element in the vector squared
         (self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]).sqrt()
